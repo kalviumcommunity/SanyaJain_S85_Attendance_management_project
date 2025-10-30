@@ -33,11 +33,19 @@ public class Main {
 
         displaySchoolDirectory(regService);
 
-        // --- Course Setup via RegistrationService ---
-        Course course1 = regService.createCourse("Intro to Quantum Physics");
-        Course course2 = regService.createCourse("Advanced Algorithms");
+        // --- Course Setup via RegistrationService (with capacity) ---
+        Course course1 = regService.createCourse("Intro to Quantum Physics", 2);
+        Course course2 = regService.createCourse("Advanced Algorithms", 1);
 
-        System.out.println("\n\n--- Available Courses ---");
+        // --- Enrollments ---
+        System.out.println("\n\n--- Enrolling Students ---");
+        regService.enrollStudentInCourse(student1, course1); // succeed
+        regService.enrollStudentInCourse(student2, course1); // succeed
+        regService.enrollStudentInCourse(student2, course1); // duplicate attempt
+        regService.enrollStudentInCourse(student1, course2); // succeed
+        regService.enrollStudentInCourse(student2, course2); // fail (capacity)
+
+        System.out.println("\n\n--- Courses After Enrollment ---");
         for (Course c : regService.getCourses()) {
             c.displayDetails();
         }
@@ -45,10 +53,18 @@ public class Main {
         // --- Demonstrate Overloaded markAttendance() Methods ---
         System.out.println("\n\n--- Marking Attendance (Overloaded Methods) ---");
 
-    // Use ID-based method (lookups happen via RegistrationService)
-    attendanceService.markAttendance(student1.getId(), course1.getCourseId(), "Present");
-    attendanceService.markAttendance(student2.getId(), course2.getCourseId(), "Absent");
-    attendanceService.markAttendance(student1.getId(), course2.getCourseId(), "Late");
+        // Only mark attendance if student is enrolled in the course
+        if (course1.getEnrolledStudents().contains(student1)) {
+            attendanceService.markAttendance(student1.getId(), course1.getCourseId(), "Present");
+        }
+        if (course2.getEnrolledStudents().contains(student2)) {
+            attendanceService.markAttendance(student2.getId(), course2.getCourseId(), "Absent");
+        } else {
+            System.out.println("Skipping attendance: " + student2.getName() + " is not enrolled in " + course2.getCourseName());
+        }
+        if (course2.getEnrolledStudents().contains(student1)) {
+            attendanceService.markAttendance(student1.getId(), course2.getCourseId(), "Late");
+        }
 
         // --- Display Attendance Logs ---
         System.out.println("\n\n--- Full Attendance Log ---");

@@ -35,8 +35,8 @@ public class RegistrationService {
         return st;
     }
 
-    public Course createCourse(String courseName) {
-        Course c = new Course(courseName);
+    public Course createCourse(String courseName, int capacity) {
+        Course c = new Course(courseName, capacity);
         courses.add(c);
         return c;
     }
@@ -69,6 +69,22 @@ public class RegistrationService {
         result.addAll(teachers);
         result.addAll(staffMembers);
         return result;
+    }
+
+    // Enrollment
+    public boolean enrollStudentInCourse(Student student, Course course) {
+        if (student == null || course == null) {
+            System.out.println("❌ Cannot enroll: student or course is null.");
+            return false;
+        }
+        boolean added = course.addStudent(student);
+        if (added) {
+            System.out.println("✅ Enrolled " + student.getName() + " into " + course.getCourseName());
+        } else {
+            System.out.println("❌ Failed to enroll " + student.getName() + " into " + course.getCourseName() +
+                               " (capacity reached or already enrolled)");
+        }
+        return added;
     }
 
     // Persistence
